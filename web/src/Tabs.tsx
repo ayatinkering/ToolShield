@@ -223,7 +223,7 @@ export function SolutionTab() {
             </tr>
             <tr>
               <td><strong>AST Taint Analysis</strong></td>
-              <td><span className="badge badge-allow">YES (Source->Sink)</span></td>
+              <td><span className="badge badge-allow">YES (Source &rarr; Sink)</span></td>
               <td>NO</td>
               <td>NO</td>
             </tr>
