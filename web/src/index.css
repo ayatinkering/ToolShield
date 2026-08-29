@@ -36,7 +36,7 @@ h1, h2, h3, .serif-heading {
 }
 
 .container {
-  max-width: 960px;
+  max-width: 1080px;
   margin: 0 auto;
   padding: 0 24px;
 }
@@ -61,6 +61,7 @@ header {
   display: flex;
   align-items: center;
   gap: 12px;
+  cursor: pointer;
 }
 
 .logo-icon {
@@ -78,7 +79,8 @@ header {
 
 .nav-links {
   display: flex;
-  gap: 24px;
+  align-items: center;
+  gap: 28px;
 }
 
 .nav-btn {
@@ -102,7 +104,7 @@ header {
   border-bottom: 2px solid var(--text-primary);
 }
 
-.github-link {
+.github-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -110,11 +112,21 @@ header {
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
+  padding: 6px 14px;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
-/* Main Content Layout - Flowing Downwards Without Boxes */
+.github-btn:hover {
+  background: #1A1A1A;
+  color: #FFFFFF;
+}
+
+/* Main Content Layout */
 main {
-  padding: 40px 0 80px 0;
+  padding-top: 48px;
+  padding-bottom: 64px;
 }
 
 .section-block {
@@ -122,17 +134,61 @@ main {
 }
 
 .hero-title {
-  font-size: 3.25rem;
-  line-height: 1.1;
-  margin-bottom: 12px;
+  font-size: 3.5rem;
+  line-height: 1.08;
+  margin-bottom: 16px;
   color: var(--text-primary);
 }
 
 .hero-subtitle {
   font-size: 1.25rem;
   color: var(--text-secondary);
-  max-width: 800px;
+  margin-bottom: 16px;
+  font-weight: 400;
+}
+
+.hero-tagline {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  font-style: italic;
   margin-bottom: 32px;
+}
+
+/* Buttons */
+.btn-black {
+  background: #000000;
+  color: #FFFFFF;
+  padding: 12px 24px;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-black:hover {
+  opacity: 0.85;
+}
+
+.btn-light {
+  background: transparent;
+  color: var(--text-primary);
+  padding: 12px 24px;
+  border-radius: 6px;
+  border: 1px solid var(--border-light);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-light:hover {
+  background: #F2F0E9;
 }
 
 /* Badges */
@@ -181,4 +237,16 @@ pre {
 .rule-table th {
   font-weight: 600;
   color: var(--text-secondary);
+}
+
+/* Grid Layouts */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .grid-2 { grid-template-columns: 1fr; }
 }

@@ -1,5 +1,45 @@
 import React from 'react';
 
+export function IntroTab({ onNavigate }: { onNavigate: (tab: 'installation' | 'docs' | 'solution') => void }) {
+  return (
+    <div>
+      <div className="section-block grid-2">
+        <div>
+          <h1 className="hero-title">ToolShield</h1>
+          <p className="hero-subtitle">
+            Implementation-Aware Security Proxy for Model Context Protocol (MCP) Servers
+          </p>
+          <p className="hero-tagline">
+            "Tool descriptions are claims. ToolShield verifies implementation evidence before execution."
+          </p>
+
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <button className="btn-black" onClick={() => onNavigate('installation')}>
+              Installation →
+            </button>
+            <button className="btn-light" onClick={() => onNavigate('solution')}>
+              Solution
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <img
+            src="/hero_diagram.svg"
+            alt="ToolShield Execution Gate Diagram"
+            style={{
+              width: '100%',
+              borderRadius: '8px',
+              border: '1px solid var(--border-light)',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.06)'
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function InstallationTab() {
   return (
     <div>
@@ -27,23 +67,6 @@ export function InstallationTab() {
         <p style={{ color: 'var(--text-secondary)' }}>To remove ToolShield binaries and clean environment paths:</p>
         <pre>{`# Linux / macOS
 curl -sSL https://raw.githubusercontent.com/ayatinkering/ToolShield/main/uninstall.sh | bash`}</pre>
-      </div>
-
-      <div className="section-block">
-        <h2 style={{ fontSize: '1.85rem', marginBottom: '8px' }}>VS Code Extension (.vsix)</h2>
-        <p style={{ color: 'var(--text-secondary)' }}>
-          Download the pre-compiled VS Code extension for inline MCP guardgate diagnostics.
-        </p>
-        <p style={{ marginTop: '8px' }}>
-          <a
-            href="https://github.com/ayatinkering/ToolShield/releases"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: 'var(--accent-color)', fontWeight: 600 }}
-          >
-            Download toolshield-0.2.0.vsix →
-          </a>
-        </p>
       </div>
     </div>
   );
@@ -191,7 +214,7 @@ export function SolutionTab() {
         <ol style={{ color: 'var(--text-secondary)', paddingLeft: '24px', lineHeight: '2.0' }}>
           <li><strong>MCP Subprocess Spawning:</strong> Target Python MCP server launched under proxy supervision with isolated stdio pipe redirection.</li>
           <li><strong>Bounded AST Parsing:</strong> Source files parsed into Python Abstract Syntax Trees within strict node and size limits (512KB, 10,000 nodes).</li>
-          <li><strong>Import Alias Resolution:</strong> Canonicalizing aliased import names (e.g., <code style={{ padding: '2px 6px' }}>import requests as r</code> &rarr; <code style={{ padding: '2px 6px' }}>requests.post</code>).</li>
+          <li><strong>Import Alias Resolution:</strong> Canonicalizing aliased import names (e.g., <code style={{ padding: '2px 6px' }}>import requests as r</code> -> <code style={{ padding: '2px 6px' }}>requests.post</code>).</li>
           <li><strong>Source Detection:</strong> Identifying secret retrieval calls (<code style={{ padding: '2px 6px' }}>os.getenv</code>, <code style={{ padding: '2px 6px' }}>os.environ</code>, <code style={{ padding: '2px 6px' }}>open(".env")</code>).</li>
           <li><strong>Sink Detection:</strong> Identifying exfiltration and execution targets (<code style={{ padding: '2px 6px' }}>httpx.post</code>, <code style={{ padding: '2px 6px' }}>subprocess.run</code>, <code style={{ padding: '2px 6px' }}>open(..., "w")</code>).</li>
           <li><strong>Taint Flow Propagation:</strong> Tracking variable assignments, dictionary constructions, binary string operations, and keyword arguments from sources to sinks.</li>
@@ -202,12 +225,32 @@ export function SolutionTab() {
 
       <div className="section-block">
         <h2 style={{ fontSize: '2rem', marginBottom: '16px' }}>4. Literature Review</h2>
-        <ul style={{ color: 'var(--text-secondary)', paddingLeft: '24px', lineHeight: '1.9' }}>
-          <li><strong>OWASP Top 10 for MCP (2025/2026):</strong> Identifies Tool Poisoning, Secret Exfiltration, and Shadow Tool Capabilities as primary threat vectors.</li>
-          <li><strong>DevSecOps Tool Poisoning Research:</strong> Highlights risks of innocent-looking utility tools manipulating LLM agent context.</li>
-          <li><strong>ResearchGate Web3 MCP Security Survey (2026):</strong> Emphasizes cryptographic baseline hashing for supply chain tool updates.</li>
-          <li><strong>arXiv:2608.11878:</strong> Static Analysis for LLM Tool Chaining Safety and Taint Tracking.</li>
-          <li><strong>arXiv:2608.04053:</strong> Zero-Trust Execution Gates in Model Context Protocols.</li>
+        <ul style={{ color: 'var(--text-secondary)', paddingLeft: '24px', lineHeight: '2.0' }}>
+          <li>
+            <a href="https://owasp.org/www-project-mcp-top-10/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-color)', fontWeight: 600 }}>
+              OWASP Top 10 for MCP (2025/2026)
+            </a>: Identifies Tool Poisoning, Secret Exfiltration, and Shadow Tool Capabilities as primary threat vectors.
+          </li>
+          <li>
+            <a href="https://www.practical-devsecops.com/mcp-tool-poisoning/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-color)', fontWeight: 600 }}>
+              DevSecOps Tool Poisoning Research
+            </a>: Highlights risks of innocent-looking utility tools manipulating LLM agent context.
+          </li>
+          <li>
+            <a href="https://www.researchgate.net/publication/412590523_When_Agents_Act_on_Web3_An_Attack-Surface_Survey_of_MCP_Skills_and_Tool_Calling" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-color)', fontWeight: 600 }}>
+              ResearchGate Web3 MCP Security Survey (2026)
+            </a>: Emphasizes cryptographic baseline hashing for supply chain tool updates.
+          </li>
+          <li>
+            <a href="https://arxiv.org/abs/2608.11878" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-color)', fontWeight: 600 }}>
+              arXiv:2608.11878
+            </a>: Static Analysis for LLM Tool Chaining Safety and Taint Tracking.
+          </li>
+          <li>
+            <a href="https://arxiv.org/abs/2608.04053" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-color)', fontWeight: 600 }}>
+              arXiv:2608.04053
+            </a>: Zero-Trust Execution Gates in Model Context Protocols.
+          </li>
         </ul>
       </div>
 
@@ -231,7 +274,7 @@ export function SolutionTab() {
             </tr>
             <tr>
               <td><strong>AST Taint Analysis</strong></td>
-              <td><span className="badge badge-allow">YES (Source &rarr; Sink)</span></td>
+              <td><span className="badge badge-allow">YES (Source->Sink)</span></td>
               <td>NO</td>
               <td>NO</td>
             </tr>
