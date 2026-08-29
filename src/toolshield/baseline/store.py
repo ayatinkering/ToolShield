@@ -24,7 +24,7 @@ class BaselineStore:
                     fpath = os.path.join(dirpath, fname)
                     with open(fpath, "rb") as f:
                         hasher.update(f.read())
-        return hasher.hexdigest()
+        return hashlib.sha256(hasher.hexdigest().encode("utf-8")).hexdigest()
 
     @classmethod
     def create_baseline(cls, tool_name: str, tool_metadata: Dict[str, Any], source_root: str) -> Dict[str, Any]:
@@ -34,6 +34,21 @@ class BaselineStore:
             "metadata_hash": cls.compute_metadata_hash(tool_metadata),
             "implementation_hash": cls.compute_implementation_hash(source_root),
         }
+
+    @classmethod
+    def save_baseline(cls, file_path: str, baseline_data: Dict[str, Any]) -> None:
+        """Save baseline JSON record to file."""
+        os.makedirs(os.path.dirname(os.path.abspath(file_path)), exist_ok=True)
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(baseline_data, f, indent=2, sort_keys=True)
+
+    @classmethod
+    def load_baseline(cls, file_path: str) -> Dict[str, Any]:
+        """Load baseline JSON record from file."""
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"Baseline file not found: {file_path}")
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
 
     @classmethod
     def check_diff(cls, baseline: Dict[str, Any], current_metadata: Dict[str, Any], current_source_root: str) -> Tuple[bool, bool]:
