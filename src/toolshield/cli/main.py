@@ -8,9 +8,6 @@ import uvicorn
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-from rich.text import Text
-from rich.columns import Columns
-from rich.layout import Layout
 from toolshield import __version__
 from toolshield.baseline.store import BaselineStore
 from toolshield.graph.renderer import GraphRenderer
@@ -26,46 +23,47 @@ app = typer.Typer(
 )
 console = Console()
 
-# Cyber-Defense Mint Green Color Palette
-MINT_GREEN = "#6FFCBA"
-PITCH_BLACK = "#0A0D0F"
+# Electric Blue Color Palette
+ELECTRIC_BLUE = "#3B82F6"
+LIGHT_ELECTRIC_BLUE = "#60A5FA"
+DARK_BG = "#0B0F19"
 CRISP_WHITE = "#FFFFFF"
 SOFT_SILVER = "#94A3B8"
 
 
 def render_cyber_dashboard():
-    """Render Cyber-Defense Mint Green interactive TUI dashboard."""
-    banner_text = f"""[bold {MINT_GREEN}]
+    """Render Electric Blue interactive TUI dashboard."""
+    banner_text = f"""[bold {LIGHT_ELECTRIC_BLUE}]
  ████████╗ ██████╗  ██████╗ ██╗     ███████╗██╗██╗███████╗██╗     ██████╗ 
  ╚══██╔══╝██╔═══██╗██╔═══██╗██║     ██╔════╝██║██║██╔════╝██║     ██╔══██╗
     ██║   ██║   ██║██║   ██║██║     ███████╗█████║█████╗  ██║     ██║  ██║
     ██║   ██║   ██║██║   ██║██║     ╚════██║██╔═██║██╔══╝  ██║     ██║  ██║
     ██║   ╚██████╔╝╚██████╔╝███████╗███████║██║ ██║███████╗███████╗██████╔╝
-    ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚══════╝╚═╝ ╚═╝╚══════╝╚══════╝╚═════╝ [/bold {MINT_GREEN}]
+    ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚══════╝╚═╝ ╚═╝╚══════╝╚══════╝╚═════╝ [/bold {LIGHT_ELECTRIC_BLUE}]
     [italic {SOFT_SILVER}]Implementation-Aware MCP Security Proxy • Version {__version__}[/italic {SOFT_SILVER}]
 """
-    console.print(Panel(banner_text, style=f"on {PITCH_BLACK}", border_style=MINT_GREEN, expand=False))
+    console.print(Panel(banner_text, style=f"on {DARK_BG}", border_style=ELECTRIC_BLUE, expand=False))
 
     # Panel 1: Active Guardgate Status
     status_table = Table(box=None, show_header=False, expand=True)
-    status_table.add_column("Key", style=f"bold {MINT_GREEN}", width=24)
+    status_table.add_column("Key", style=f"bold {LIGHT_ELECTRIC_BLUE}", width=24)
     status_table.add_column("Value", style=CRISP_WHITE)
 
-    status_table.add_row("Policy Engine", f"[{MINT_GREEN}]ACTIVE[/{MINT_GREEN}] (Rules S001-S009 Enforced)")
-    status_table.add_row("Execution Gate", f"[{MINT_GREEN}]ONLINE[/{MINT_GREEN}] (Zero-Byte Forwarding on BLOCK)")
-    status_table.add_row("Baseline Store", f"[{MINT_GREEN}]SYNCED[/{MINT_GREEN}] (SHA-256 Fingerprinting Ready)")
-    status_table.add_row("Control Plane API", f"[{MINT_GREEN}]READY[/{MINT_GREEN}] (http://127.0.0.1:8000)")
+    status_table.add_row("Policy Engine", f"[{LIGHT_ELECTRIC_BLUE}]ACTIVE[/{LIGHT_ELECTRIC_BLUE}] (Rules S001-S009 Enforced)")
+    status_table.add_row("Execution Gate", f"[{LIGHT_ELECTRIC_BLUE}]ONLINE[/{LIGHT_ELECTRIC_BLUE}] (Zero-Byte Forwarding on BLOCK)")
+    status_table.add_row("Baseline Store", f"[{LIGHT_ELECTRIC_BLUE}]SYNCED[/{LIGHT_ELECTRIC_BLUE}] (SHA-256 Fingerprinting Ready)")
+    status_table.add_row("Control Plane API", f"[{LIGHT_ELECTRIC_BLUE}]READY[/{LIGHT_ELECTRIC_BLUE}] (http://127.0.0.1:8000)")
 
     status_panel = Panel(
         status_table,
         title=f"[bold {CRISP_WHITE}]Active Guardgate Status[/bold {CRISP_WHITE}]",
-        border_style=MINT_GREEN,
-        style=f"on {PITCH_BLACK}",
+        border_style=ELECTRIC_BLUE,
+        style=f"on {DARK_BG}",
     )
 
     # Panel 2: Quickstart Command Matrix
     cmd_table = Table(box=None, expand=True)
-    cmd_table.add_column("Command", style=f"bold {MINT_GREEN}", width=22)
+    cmd_table.add_column("Command", style=f"bold {LIGHT_ELECTRIC_BLUE}", width=22)
     cmd_table.add_column("Description", style=SOFT_SILVER)
 
     cmd_table.add_row("toolshield scan <dir>", "Scan Python MCP server source for capabilities & taint")
@@ -78,18 +76,18 @@ def render_cyber_dashboard():
     cmd_panel = Panel(
         cmd_table,
         title=f"[bold {CRISP_WHITE}]Quickstart Command Matrix[/bold {CRISP_WHITE}]",
-        border_style=MINT_GREEN,
-        style=f"on {PITCH_BLACK}",
+        border_style=ELECTRIC_BLUE,
+        style=f"on {DARK_BG}",
     )
 
     console.print(status_panel)
     console.print(cmd_panel)
-    console.print(f"\n[bold {MINT_GREEN}]toolshield >[/bold {MINT_GREEN}] ", end="")
+    console.print(f"\n[bold {LIGHT_ELECTRIC_BLUE}]toolshield >[/bold {LIGHT_ELECTRIC_BLUE}] ", end="")
 
 
 @app.callback()
 def main_callback(ctx: typer.Context):
-    """Main callback to render cyber-defense dashboard when invoked without subcommands."""
+    """Main callback to render Electric Blue dashboard when invoked without subcommands."""
     if ctx.invoked_subcommand is None:
         render_cyber_dashboard()
 
@@ -97,7 +95,7 @@ def main_callback(ctx: typer.Context):
 @app.command()
 def version():
     """Print ToolShield version."""
-    console.print(f"[bold green]ToolShield[/bold green] version [cyan]{__version__}[/cyan]")
+    console.print(f"[bold blue]ToolShield[/bold blue] version [cyan]{__version__}[/cyan]")
 
 
 @app.command()
@@ -106,7 +104,7 @@ def serve(
     port: int = typer.Option(8000, "--port", "-p", help="Port for API server"),
 ):
     """Launch FastAPI control plane REST API server."""
-    console.print(f"[bold green]Starting ToolShield Control Plane API at http://{host}:{port}[/bold green]")
+    console.print(f"[bold blue]Starting ToolShield Control Plane API at http://{host}:{port}[/bold blue]")
     uvicorn.run("toolshield.api.api:app", host=host, port=port, reload=False)
 
 
@@ -145,7 +143,7 @@ def proxy(
 ):
     """Launch target MCP server behind ToolShield stdio proxy execution gate."""
     err_console = Console(stderr=True)
-    err_console.print(f"[bold green]ToolShield Proxy Gate starting for:[/bold green] {target_command}")
+    err_console.print(f"[bold blue]ToolShield Proxy Gate starting for:[/bold blue] {target_command}")
     
     proxy_gate = StdioProxyGate(
         source_root=source_root,
