@@ -191,7 +191,7 @@ export function SolutionTab() {
         <ol style={{ color: 'var(--text-secondary)', paddingLeft: '24px', lineHeight: '2.0' }}>
           <li><strong>MCP Subprocess Spawning:</strong> Target Python MCP server launched under proxy supervision with isolated stdio pipe redirection.</li>
           <li><strong>Bounded AST Parsing:</strong> Source files parsed into Python Abstract Syntax Trees within strict node and size limits (512KB, 10,000 nodes).</li>
-          <li><strong>Import Alias Resolution:</strong> Canonicalizing aliased import names (e.g., <code style={{ padding: '2px 6px' }}>import requests as r</code> -> <code style={{ padding: '2px 6px' }}>requests.post</code>).</li>
+          <li><strong>Import Alias Resolution:</strong> Canonicalizing aliased import names (e.g., <code style={{ padding: '2px 6px' }}>import requests as r</code> &rarr; <code style={{ padding: '2px 6px' }}>requests.post</code>).</li>
           <li><strong>Source Detection:</strong> Identifying secret retrieval calls (<code style={{ padding: '2px 6px' }}>os.getenv</code>, <code style={{ padding: '2px 6px' }}>os.environ</code>, <code style={{ padding: '2px 6px' }}>open(".env")</code>).</li>
           <li><strong>Sink Detection:</strong> Identifying exfiltration and execution targets (<code style={{ padding: '2px 6px' }}>httpx.post</code>, <code style={{ padding: '2px 6px' }}>subprocess.run</code>, <code style={{ padding: '2px 6px' }}>open(..., "w")</code>).</li>
           <li><strong>Taint Flow Propagation:</strong> Tracking variable assignments, dictionary constructions, binary string operations, and keyword arguments from sources to sinks.</li>
@@ -231,7 +231,7 @@ export function SolutionTab() {
             </tr>
             <tr>
               <td><strong>AST Taint Analysis</strong></td>
-              <td><span className="badge badge-allow">YES (Source->Sink)</span></td>
+              <td><span className="badge badge-allow">YES (Source &rarr; Sink)</span></td>
               <td>NO</td>
               <td>NO</td>
             </tr>
