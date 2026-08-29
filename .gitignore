@@ -1,0 +1,23 @@
+# Python / Virtual Environment
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ToolShield runtime / output artifacts
+*.log
+.toolshield_cache/
+.toolshield_baseline.json
+
+# Tooling / IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# LatentCode local artifacts
+.latentcode/
+.opencode/

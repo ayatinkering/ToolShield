@@ -1,0 +1,14 @@
+services:
+  toolshield:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: uv run toolshield --help
+
+  test:
+    build: .
+    volumes:
+      - .:/app
+    command: uv run pytest
