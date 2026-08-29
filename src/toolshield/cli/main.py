@@ -4,6 +4,7 @@ import sys
 import tempfile
 from typing import List, Optional
 import typer
+import uvicorn
 from rich.console import Console
 from rich.table import Table
 from toolshield import __version__
@@ -25,6 +26,16 @@ console = Console()
 def version():
     """Print ToolShield version."""
     console.print(f"[bold green]ToolShield[/bold green] version [cyan]{__version__}[/cyan]")
+
+
+@app.command()
+def serve(
+    host: str = typer.Option("127.0.0.1", "--host", "-h", help="Host address for API server"),
+    port: int = typer.Option(8000, "--port", "-p", help="Port for API server"),
+):
+    """Launch FastAPI control plane REST API server."""
+    console.print(f"[bold green]Starting ToolShield Control Plane API at http://{host}:{port}[/bold green]")
+    uvicorn.run("toolshield.api.api:app", host=host, port=port, reload=False)
 
 
 @app.command()
