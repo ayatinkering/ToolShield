@@ -7,7 +7,7 @@ export function App() {
   return (
     <div className="app">
       <header>
-        <div className="container nav-wrapper">
+        <div className="nav-wrapper">
           <div className="logo-section" onClick={() => setActiveTab('intro')}>
             <img src="/star_shield.svg" alt="Star Shield" className="logo-icon" />
             <span className="logo-text">ToolShield</span>
@@ -32,19 +32,20 @@ export function App() {
             >
               Solution
             </button>
-            <a
-              href="https://github.com/ayatinkering/ToolShield"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="github-btn"
-            >
-              GitHub Repo
-            </a>
           </nav>
+
+          <a
+            href="https://github.com/ayatinkering/ToolShield"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="github-btn"
+          >
+            GitHub
+          </a>
         </div>
       </header>
 
-      <main className="container">
+      <main>
         {activeTab === 'intro' && <IntroTab onNavigate={(tab) => setActiveTab(tab)} />}
         {activeTab === 'installation' && <InstallationTab />}
         {activeTab === 'docs' && <DocsTab />}
