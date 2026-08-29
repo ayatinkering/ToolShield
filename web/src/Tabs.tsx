@@ -460,7 +460,7 @@ export function SolutionTab() {
         <p style={{ marginBottom: '8px', color: '#333333' }}>
           <strong>Technical detail:</strong> The resolver walks all <code style={{ padding: '2px 6px' }}>ast.Import</code> and
           <code style={{ padding: '2px 6px' }}>ast.ImportFrom</code> nodes, building a dictionary mapping alias names to their
-          canonical module paths. e.g., <code style={{ padding: '2px 6px' }}>&#123;"r": "requests", "p": "httpx.post"&#125;</code>.
+          canonical module paths. e.g., <code style={{ padding: '2px 6px' }}>&lbrace;"r": "requests", "p": "httpx.post"&rbrace;</code>.
           Every function call node is then checked against this resolved namespace, not the raw
           source text.
         </p>
@@ -527,9 +527,9 @@ response = requests.post(url, headers=headers)  # ← TAINT SINK: S001 BLOCK tri
         </p>
         <ul style={{ paddingLeft: '24px', marginBottom: '24px', color: '#333333' }}>
           <li><strong>Direct assignment:</strong> <code style={{ padding: '2px 6px' }}>x = tainted_var</code> &rarr; x is tainted</li>
-          <li><strong>String formatting:</strong> <code style={{ padding: '2px 6px' }}>f"Bearer &#123;tainted_var&#125;"</code> &rarr; result is tainted</li>
-          <li><strong>Dictionary packing:</strong> <code style={{ padding: '2px 6px' }}>&#123;"key": tainted_var&#125;</code> &rarr; dict is tainted</li>
-          <li><strong>Dict unpacking:</strong> <code style={{ padding: '2px 6px' }}>&#123;**tainted_dict&#125;</code> &rarr; new dict is tainted</li>
+          <li><strong>String formatting:</strong> <code style={{ padding: '2px 6px' }}>f"Bearer {"{"}tainted_var{"}"}"</code> &rarr; result is tainted</li>
+          <li><strong>Dictionary packing:</strong> <code style={{ padding: '2px 6px' }}>{"{"}"key": tainted_var{"}"}</code> &rarr; dict is tainted</li>
+          <li><strong>Dict unpacking:</strong> <code style={{ padding: '2px 6px' }}>{"{"}**tainted_dict{"}"}</code> &rarr; new dict is tainted</li>
           <li><strong>Binary concatenation:</strong> <code style={{ padding: '2px 6px' }}>"prefix" + tainted_var</code> &rarr; result is tainted</li>
           <li><strong>Keyword arguments:</strong> <code style={{ padding: '2px 6px' }}>func(param=tainted_var)</code> &rarr; if func is a sink, BLOCK</li>
           <li><strong>List elements:</strong> <code style={{ padding: '2px 6px' }}>[tainted_var]</code> &rarr; list is tainted</li>
