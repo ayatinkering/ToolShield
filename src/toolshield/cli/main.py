@@ -18,7 +18,7 @@ from toolshield.scanner import ASTScanner
 
 app = typer.Typer(
     name="toolshield",
-    help="Implementation-aware security proxy for Model Context Protocol (MCP) servers.",
+    help="Implementation-aware security proxy for MCP servers.",
     invoke_without_command=True,
 )
 console = Console()

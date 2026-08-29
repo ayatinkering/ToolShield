@@ -144,7 +144,7 @@ When a user executes `toolshield` in their terminal or VS Code panel, an interac
 
 ### 3.1 Header Navbar Layout
 * **Left-Hand Side (LHS):**
-  * **Brand Icon:** Star-Shield Favicon (`/assets/star_shield.png` — Black shield outline with an 8-pointed star compass motif).
+  * **Brand Icon:** Star-Shield Favicon (`/assets/toolshield_icon.png` — Black shield outline with an 8-pointed star compass motif).
   * **Title:** `ToolShield` rendered in `Instrument Serif` typography (`24px`, weight `600`).
   * **Tagline Badge:** `v0.2.0 HACKATHON EDITION` in light mint badge (`#E6FFFA`, border `#6FFCBA`).
 * **Right-Hand Side (RHS) Navigation Items:**
@@ -339,7 +339,7 @@ LatentCode should execute the following 5 phases step-by-step:
 2. Apply Black (`#0A0D0F`), White (`#FFFFFF`), and Mint Green (`#6FFCBA`) styling to borders, headers, and prompts.
 
 ### Phase 3: Web App Navbar & Branding Update
-1. Add Star-Shield logo asset (`web/public/star_shield.png` / inline SVG).
+1. Add Star-Shield logo asset (`web/public/toolshield_icon.png` / inline SVG).
 2. Update `web/src/App.tsx` header layout with LHS logo/title and RHS 4 tabs (`Installation`, `Docs`, `Our Solution`, `Demo`).
 
 ### Phase 4: Web App Content Pages Implementation

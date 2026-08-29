@@ -9,33 +9,37 @@ export function IntroTab({ onNavigate }: { onNavigate: (tab: 'installation' | 'd
       minHeight: 'calc(100vh - 64px)',
       display: 'flex',
       alignItems: 'center',
-      gap: '80px'
+      gap: '60px'
     }}>
-      <div style={{ flex: '0 0 55%' }}>
+      <div style={{ flex: '0 0 52%' }}>
         <h1 style={{
           fontFamily: "'Instrument Serif', Georgia, serif",
           fontSize: '3.5rem',
           lineHeight: 1.1,
-          fontWeight: 700,
+          fontWeight: 600,
           color: '#111111'
         }}>
           ToolShield
         </h1>
         <p style={{
-          fontSize: '1.25rem',
+          fontSize: '1.2rem',
           color: '#444444',
           marginTop: '20px',
-          lineHeight: 1.6
+          lineHeight: 1.6,
+          fontWeight: 400
         }}>
           Implementation-Aware Security Proxy for Model Context Protocol (MCP) Servers
         </p>
         <p style={{
           fontSize: '1rem',
-          color: '#666666',
-          marginTop: '16px',
-          fontStyle: 'italic'
+          color: '#555555',
+          marginTop: '14px',
+          lineHeight: 1.75,
+          fontWeight: 400
         }}>
-          Tool descriptions are claims. ToolShield verifies implementation evidence before execution.
+          Tool descriptions are claims. ToolShield verifies implementation evidence before execution —
+          intercepting every tool invocation, statically analyzing the Python AST source, and blocking
+          malicious data flows before a single byte reaches the MCP server process.
         </p>
 
         <div style={{ marginTop: '40px', display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -63,7 +67,7 @@ export function IntroTab({ onNavigate }: { onNavigate: (tab: 'installation' | 'd
               fontSize: '1rem',
               fontWeight: 500,
               borderRadius: '6px',
-              border: '1.5px solid #CBD5E0',
+              border: '1.5px solid #BBBBBB',
               cursor: 'pointer'
             }}
           >
@@ -72,23 +76,23 @@ export function IntroTab({ onNavigate }: { onNavigate: (tab: 'installation' | 'd
         </div>
       </div>
 
-      <div style={{ flex: '0 0 45%' }}>
+      <div style={{ flex: '1', marginLeft: '-20px' }}>
         <img
           src="/hero_diagram.jpg"
           alt="ToolShield Architecture Diagram"
           style={{
             width: '100%',
-            maxWidth: '520px',
-            borderRadius: '12px',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.12)',
+            maxWidth: '540px',
+            borderRadius: '8px',
             display: 'block',
-            margin: '0 auto'
+            margin: '0 auto 0 0'
           }}
         />
       </div>
     </div>
   );
 }
+
 
 export function InstallationTab() {
   return (
@@ -332,37 +336,14 @@ export function SolutionTab() {
           The server code never executes. The payload never fires.</strong>
         </p>
 
-        <h3 style={{ fontSize: '1.4rem', marginTop: '32px', marginBottom: '12px' }}>Architecture Diagram</h3>
 
-        <pre style={{ background: '#f5f5f5', padding: '24px', borderRadius: '8px', fontSize: '0.85rem', overflowX: 'auto', lineHeight: '1.7' }}>{`┌─────────────────┐         ┌──────────────────────────────────────────────┐
-│   AI Agent      │         │           ToolShield Proxy Gate               │
-│ (Claude / GPT)  │         │                                              │
-│                 │         │  ┌─────────────────────────────────────┐    │
-│  tools/call ──────────────────▶  Pre-Dispatch Interceptor           │    │
-│                 │         │  │  (JSON-RPC stdin reader)            │    │
-│                 │         │  └──────────────┬──────────────────────┘    │
-│                 │         │                 │                            │
-│                 │         │  ┌──────────────▼──────────────────────┐    │
-│                 │         │  │  AST Scanner & Taint Propagation    │    │
-│                 │         │  │  (Python ast module, bounded walk)  │    │
-│                 │         │  └──────────────┬──────────────────────┘    │
-│                 │         │                 │                            │
-│                 │         │  ┌──────────────▼──────────────────────┐    │
-│                 │         │  │  Policy Engine (Rules S001-S009)    │    │
-│                 │         │  └──────────────┬──────────────────────┘    │
-│                 │         │                 │                            │
-│                 │         │         ALLOW / REVIEW / BLOCK              │
-│                 │         │           ╱            ╲                    │
-│                 │         │    ┌─────▼─────┐  ┌────▼──────────────┐    │
-│                 │         │    │  Forward  │  │  BLOCK: 0 bytes   │    │
-│                 │         │    │ to Server │  │  written to stdin │    │
-│                 │         │    └─────┬─────┘  └───────────────────┘    │
-│                 │         └──────────┼───────────────────────────────────┘
-│                 │                    │
-│                 │         ┌──────────▼──────────┐
-│                 │         │  MCP Server Process  │
-│                 │         │  (Python child proc) │
-└─────────────────┘         └─────────────────────┘`}</pre>
+        <h3 style={{ fontSize: '1.4rem', marginTop: '32px', marginBottom: '16px' }}>Architecture Diagram</h3>
+
+        <img
+          src="/architecture_diagram.png"
+          alt="ToolShield 4-Phase Architecture: Stdio Interception, AST Parsing, Taint Analysis, Policy Gate"
+          style={{ width: '100%', maxWidth: '820px', borderRadius: '8px', margin: '0 0 32px 0', display: 'block' }}
+        />
 
         <h3 style={{ fontSize: '1.4rem', marginTop: '32px', marginBottom: '12px' }}>Why Static Analysis Is the Right Approach</h3>
 
@@ -390,203 +371,122 @@ export function SolutionTab() {
           for typical MCP servers &mdash; imperceptible to the agent or user.
         </p>
 
-        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '8px' }}>Stage 1 &mdash; MCP Subprocess Spawning &amp; Stdio Pipe Isolation</h3>
-        <p style={{ marginBottom: '8px', color: '#333333' }}>
-          <strong>What it does:</strong> ToolShield launches the target Python MCP server as a child
-          subprocess with its stdin and stdout fully controlled by the proxy via OS-level pipe redirection.
-          The server has no ability to write directly to the terminal or the agent's connection &mdash;
-          all I/O passes through ToolShield's gate.
-        </p>
-        <p style={{ marginBottom: '8px', color: '#333333' }}>
-          <strong>Technical detail:</strong> Uses Python's <code style={{ padding: '2px 6px' }}>subprocess.Popen</code> with
-          <code style={{ padding: '2px 6px' }}>stdin=PIPE, stdout=PIPE, stderr=PIPE</code>. The ToolShield proxy owns both ends of
-          every pipe. This gives the proxy exclusive read/write control over what the server process
-          sends and receives.
-        </p>
-        <p style={{ marginBottom: '24px', color: '#333333' }}>
-          <strong>Why it matters:</strong> This is the foundational containment boundary. Even before
-          any analysis runs, the server cannot communicate outside the proxy's control. Think of it as
-          placing the server inside a locked room where ToolShield controls the only door.
+        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '10px' }}>Stage 1 &mdash; MCP Subprocess Spawning &amp; Stdio Pipe Isolation</h3>
+        <p style={{ marginBottom: '28px', color: '#333333', lineHeight: '1.85' }}>
+          ToolShield launches the target Python MCP server as a child subprocess using Python's <code style={{ padding: '2px 6px' }}>subprocess.Popen</code> with
+          <code style={{ padding: '2px 6px' }}>stdin=PIPE, stdout=PIPE, stderr=PIPE</code>, giving the proxy exclusive ownership of both ends of every I/O pipe.
+          The server has no ability to write to the terminal or communicate with the AI agent directly &mdash; all messages pass through ToolShield's gate.
+          This is the foundational containment boundary: even before any analysis runs, the server is inside a locked room where ToolShield controls the only door.
+          It is architecturally impossible for the server to transmit data outside this boundary without ToolShield's explicit relay.
         </p>
 
-        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '8px' }}>Stage 2 &mdash; Pre-Dispatch JSON-RPC Interception</h3>
-        <p style={{ marginBottom: '8px', color: '#333333' }}>
-          <strong>What it does:</strong> ToolShield reads each newline-delimited JSON-RPC message
-          from the AI agent's connection. For <code style={{ padding: '2px 6px' }}>tools/list</code> requests, it forwards normally
-          (the tool list is informational, not dangerous). For <code style={{ padding: '2px 6px' }}>tools/call</code> requests &mdash;
-          where actual code execution would happen &mdash; ToolShield holds the message in memory and
-          triggers the analysis pipeline before forwarding.
-        </p>
-        <p style={{ marginBottom: '8px', color: '#333333' }}>
-          <strong>Technical detail:</strong> JSON-RPC 2.0 over stdio is the MCP wire protocol.
-          Each request is a single UTF-8 JSON line. ToolShield parses the <code style={{ padding: '2px 6px' }}>method</code> field;
-          on <code style={{ padding: '2px 6px' }}>"tools/call"</code>, it routes to the analysis engine instead of the server stdin.
-        </p>
-        <p style={{ marginBottom: '24px', color: '#333333' }}>
-          <strong>Why it matters:</strong> This is the "gate" in execution gate. No tool invocation
-          bypasses this stage. It is architecturally impossible for the server to receive a tool call
-          without first passing the analysis.
+        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '10px' }}>Stage 2 &mdash; Pre-Dispatch JSON-RPC Interception</h3>
+        <p style={{ marginBottom: '28px', color: '#333333', lineHeight: '1.85' }}>
+          MCP uses JSON-RPC 2.0 over stdio as its wire protocol, where each message is a single newline-delimited UTF-8 JSON object.
+          ToolShield reads every inbound message from the AI agent and inspects the <code style={{ padding: '2px 6px' }}>method</code> field to decide routing:
+          <code style={{ padding: '2px 6px' }}>tools/list</code> requests (which only enumerate available tools) pass through directly,
+          but <code style={{ padding: '2px 6px' }}>tools/call</code> requests are held in an in-memory buffer and routed into the full analysis pipeline before any forwarding.
+          This is the "gate" &mdash; it is structurally impossible for any tool invocation to bypass this stage or reach the server without completing analysis.
         </p>
 
-        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '8px' }}>Stage 3 &mdash; Bounded Python AST Parsing</h3>
-        <p style={{ marginBottom: '8px', color: '#333333' }}>
-          <strong>What it does:</strong> ToolShield reads the target MCP server's Python source files
-          and parses them into Abstract Syntax Trees using Python's built-in <code style={{ padding: '2px 6px' }}>ast</code> module.
-          An AST is a tree-structured representation of the code that makes data flows, function calls,
-          and variable assignments machine-readable without executing a single line.
-        </p>
-        <p style={{ marginBottom: '8px', color: '#333333' }}>
-          <strong>Technical detail:</strong> Parsing is bounded by hard resource limits &mdash; maximum
-          512KB source file size and 10,000 AST nodes per file &mdash; to prevent DoS via pathologically
-          large generated files. Each source file is parsed once per session and cached; subsequent
-          tool calls in the same session use the cached AST unless the baseline hash changes.
-        </p>
-        <p style={{ marginBottom: '24px', color: '#333333' }}>
-          <strong>Plain English:</strong> Imagine reading a recipe (the code) before cooking (executing it).
-          You can see from the ingredient list that a recipe calls for arsenic &mdash; you don't need to cook
-          it and taste it to know it's dangerous. AST parsing does this for code: reads the structure
-          and content without running it.
+        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '10px' }}>Stage 3 &mdash; Bounded Python AST Parsing</h3>
+        <p style={{ marginBottom: '28px', color: '#333333', lineHeight: '1.85' }}>
+          ToolShield reads the MCP server's Python source files and parses them into Abstract Syntax Trees using Python's built-in <code style={{ padding: '2px 6px' }}>ast</code> module &mdash;
+          a tree-structured, machine-readable representation of every function call, variable assignment, and data flow without executing a single instruction.
+          Parsing is resource-bounded (max 512KB per file, 10,000 AST nodes) to prevent denial-of-service via pathologically large or generated files;
+          results are cached per session so subsequent calls to the same server pay no re-parse cost unless the source hash changes.
+          Think of it as reading a recipe before cooking: you can identify arsenic in the ingredient list without tasting the dish.
         </p>
 
-        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '8px' }}>Stage 4 &mdash; Import Alias Resolution &amp; Module Canonicalization</h3>
-        <p style={{ marginBottom: '8px', color: '#333333' }}>
-          <strong>What it does:</strong> Python allows imports to be aliased:
-          <code style={{ padding: '2px 6px' }}>import requests as r</code>, <code style={{ padding: '2px 6px' }}>from httpx import post as p</code>,
-          <code style={{ padding: '2px 6px' }}>import os as operating_system</code>. If a taint scanner only looks for the string
-          <code style={{ padding: '2px 6px' }}>"requests.post"</code>, it would miss <code style={{ padding: '2px 6px' }}>r.post()</code> entirely.
-          ToolShield's import resolver builds a canonical alias map at parse time so that all
-          subsequent analysis uses resolved module names, not aliases.
-        </p>
-        <p style={{ marginBottom: '8px', color: '#333333' }}>
-          <strong>Technical detail:</strong> The resolver walks all <code style={{ padding: '2px 6px' }}>ast.Import</code> and
-          <code style={{ padding: '2px 6px' }}>ast.ImportFrom</code> nodes, building a dictionary mapping alias names to their
-          canonical module paths. e.g., <code style={{ padding: '2px 6px' }}>&lbrace;"r": "requests", "p": "httpx.post"&rbrace;</code>.
-          Every function call node is then checked against this resolved namespace, not the raw
-          source text.
-        </p>
-        <p style={{ marginBottom: '24px', color: '#333333' }}>
-          <strong>Why it matters:</strong> Real-world malicious code almost always uses aliased imports
-          to evade naive string-matching scanners. Canonical resolution closes this evasion vector.
+        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '10px' }}>Stage 4 &mdash; Import Alias Resolution &amp; Module Canonicalization</h3>
+        <p style={{ marginBottom: '28px', color: '#333333', lineHeight: '1.85' }}>
+          Python allows imports to be aliased (<code style={{ padding: '2px 6px' }}>import requests as r</code>, <code style={{ padding: '2px 6px' }}>from httpx import post as p</code>),
+          which would defeat naive string-matching scanners that only look for the literal text <code style={{ padding: '2px 6px' }}>"requests.post"</code> &mdash; silently missing <code style={{ padding: '2px 6px' }}>r.post()</code> entirely.
+          ToolShield's resolver walks all <code style={{ padding: '2px 6px' }}>ast.Import</code> and <code style={{ padding: '2px 6px' }}>ast.ImportFrom</code> nodes to build a canonical alias map
+          (&lbrace;"r": "requests", "p": "httpx.post"&rbrace;), then checks every function call against resolved module names rather than raw source text.
+          Real-world malicious code almost universally uses aliased imports to evade detection; canonical resolution closes this evasion vector entirely.
         </p>
 
-        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '8px' }}>Stage 5 &mdash; Secret Source Detection</h3>
-        <p style={{ marginBottom: '8px', color: '#333333' }}>
-          <strong>What it does:</strong> Identifies all locations in the AST where the code reads
-          sensitive data &mdash; environment variables, credential files, key stores. These are called
-          "taint sources" &mdash; the origin points of potentially dangerous data flows.
-        </p>
-        <p style={{ marginBottom: '8px', color: '#333333' }}>
-          <strong>Source patterns detected:</strong>
-        </p>
-        <ul style={{ paddingLeft: '24px', marginBottom: '16px', color: '#333333' }}>
-          <li><code style={{ padding: '2px 6px' }}>os.getenv("KEY")</code> and <code style={{ padding: '2px 6px' }}>os.environ["KEY"]</code> &mdash; environment variable reads</li>
-          <li><code style={{ padding: '2px 6px' }}>open(".env")</code>, <code style={{ padding: '2px 6px' }}>open("/etc/secrets/...")</code> &mdash; credential file reads</li>
-          <li><code style={{ padding: '2px 6px' }}>pathlib.Path(...).read_text()</code> &mdash; path-based secret file reads</li>
-          <li>Direct access to <code style={{ padding: '2px 6px' }}>sys.argv</code> items that may carry credentials</li>
-          <li>Reads from known secret management libraries (<code style={{ padding: '2px 6px' }}>boto3.client("secretsmanager")</code>, <code style={{ padding: '2px 6px' }}>google.cloud.secretmanager</code>)</li>
-        </ul>
-        <p style={{ marginBottom: '24px', color: '#333333' }}>
-          Any variable that receives a value from one of these sources is marked as "tainted" &mdash;
-          meaning its value is considered potentially secret and must not flow to dangerous outputs.
+        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '10px' }}>Stage 5 &mdash; Secret Source Detection</h3>
+        <p style={{ marginBottom: '12px', color: '#333333', lineHeight: '1.85' }}>
+          ToolShield identifies every AST node where the code reads sensitive data &mdash; environment variables, credential files, cloud secret stores &mdash; and marks
+          these as "taint sources." Any variable that receives a value from a taint source is tagged as "tainted" and tracked through all subsequent statements.
+          Sources detected include <code style={{ padding: '2px 6px' }}>os.getenv()</code>, <code style={{ padding: '2px 6px' }}>os.environ[]</code>, <code style={{ padding: '2px 6px' }}>open(".env")</code>,
+          <code style={{ padding: '2px 6px' }}>pathlib.Path(...).read_text()</code>, <code style={{ padding: '2px 6px' }}>sys.argv</code> items, and cloud secret manager clients
+          (<code style={{ padding: '2px 6px' }}>boto3.client("secretsmanager")</code>, <code style={{ padding: '2px 6px' }}>google.cloud.secretmanager</code>).
         </p>
 
-        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '8px' }}>Stage 6 &mdash; Exfiltration Sink Detection</h3>
-        <p style={{ marginBottom: '8px', color: '#333333' }}>
-          <strong>What it does:</strong> Identifies all locations in the AST where data is sent
-          outward &mdash; over the network, to a subprocess, or to a file. These are called "taint sinks" &mdash;
-          the destination points where a tainted value would cause harm.
+        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '10px' }}>Stage 6 &mdash; Exfiltration Sink Detection</h3>
+        <p style={{ marginBottom: '12px', color: '#333333', lineHeight: '1.85' }}>
+          Complementing source detection, ToolShield identifies every AST location where data exits the process &mdash; over the network, into a subprocess, or written to a file.
+          These are the "taint sinks": the destinations where a tainted value reaching them constitutes a confirmed attack.
+          Sinks include HTTP clients (<code style={{ padding: '2px 6px' }}>requests.post()</code>, <code style={{ padding: '2px 6px' }}>httpx.post()</code>, <code style={{ padding: '2px 6px' }}>urllib.request.urlopen()</code>),
+          shell execution (<code style={{ padding: '2px 6px' }}>subprocess.run()</code>, <code style={{ padding: '2px 6px' }}>os.system()</code>, <code style={{ padding: '2px 6px' }}>os.execv()</code>),
+          file writes (<code style={{ padding: '2px 6px' }}>open(..., "w")</code>, <code style={{ padding: '2px 6px' }}>Path.write_text()</code>), raw sockets, and SMTP.
         </p>
-        <p style={{ marginBottom: '8px', color: '#333333' }}>
-          <strong>Sink patterns detected:</strong>
-        </p>
-        <ul style={{ paddingLeft: '24px', marginBottom: '24px', color: '#333333' }}>
-          <li><code style={{ padding: '2px 6px' }}>requests.post()</code>, <code style={{ padding: '2px 6px' }}>requests.get()</code>, <code style={{ padding: '2px 6px' }}>httpx.post()</code>, <code style={{ padding: '2px 6px' }}>urllib.request.urlopen()</code> &mdash; HTTP exfiltration</li>
-          <li><code style={{ padding: '2px 6px' }}>subprocess.run()</code>, <code style={{ padding: '2px 6px' }}>subprocess.Popen()</code>, <code style={{ padding: '2px 6px' }}>os.system()</code>, <code style={{ padding: '2px 6px' }}>os.execv()</code> &mdash; shell/process execution</li>
-          <li><code style={{ padding: '2px 6px' }}>open(..., "w")</code>, <code style={{ padding: '2px 6px' }}>open(..., "a")</code>, <code style={{ padding: '2px 6px' }}>Path.write_text()</code> &mdash; file write sinks</li>
-          <li><code style={{ padding: '2px 6px' }}>socket.send()</code>, <code style={{ padding: '2px 6px' }}>socket.sendall()</code> &mdash; raw socket exfiltration</li>
-          <li><code style={{ padding: '2px 6px' }}>smtplib.SMTP.sendmail()</code> &mdash; email exfiltration</li>
-        </ul>
 
-        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '8px' }}>Stage 7 &mdash; Interprocedural Taint Flow Propagation</h3>
-        <p style={{ marginBottom: '8px', color: '#333333' }}>
-          <strong>What it does:</strong> This is the core analysis engine. It tracks how tainted
-          values flow through the code from sources (Stage 5) to sinks (Stage 6), following
-          variable assignments, function argument passing, string formatting, dictionary packing,
-          and list comprehensions. If a tainted value reaches a dangerous sink through any chain
-          of assignments, it is flagged as a confirmed taint flow.
+        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '10px' }}>Stage 7 &mdash; Interprocedural Taint Flow Propagation</h3>
+        <p style={{ marginBottom: '12px', color: '#333333', lineHeight: '1.85' }}>
+          This is the core analysis engine: it traces how tainted values flow from sources (Stage 5) through the code to sinks (Stage 6),
+          following direct assignments, string formatting, dictionary packing, dict unpacking, binary concatenation, keyword arguments, list elements, and return values.
+          If any chain of operations delivers a tainted value to a dangerous sink, the engine flags it as a confirmed taint flow and triggers policy evaluation.
+          The example below shows a 4-statement chain that ToolShield catches &mdash; no single line looks obviously malicious in isolation:
         </p>
-        <p style={{ marginBottom: '8px', color: '#333333' }}>
-          <strong>Example taint flow ToolShield catches:</strong>
-        </p>
-        <pre style={{ background: '#f0f0f0', padding: '16px', borderRadius: '6px', fontSize: '0.82rem', lineHeight: '1.6' }}>{`secret = os.getenv("OPENAI_API_KEY")    # ← TAINT SOURCE: secret is tainted
-payload = {"Authorization": secret}     # ← TAINT PROPAGATION: payload dict is tainted
-headers = {**payload, "Content-Type": "application/json"}  # ← TAINT PROPAGATION
-response = requests.post(url, headers=headers)  # ← TAINT SINK: S001 BLOCK triggered`}</pre>
-        <p style={{ marginBottom: '8px', color: '#333333' }}>
-          <strong>Propagation rules tracked:</strong>
-        </p>
-        <ul style={{ paddingLeft: '24px', marginBottom: '24px', color: '#333333' }}>
-          <li><strong>Direct assignment:</strong> <code style={{ padding: '2px 6px' }}>x = tainted_var</code> &rarr; x is tainted</li>
-          <li><strong>String formatting:</strong> <code style={{ padding: '2px 6px' }}>f"Bearer {"{"}tainted_var{"}"}"</code> &rarr; result is tainted</li>
-          <li><strong>Dictionary packing:</strong> <code style={{ padding: '2px 6px' }}>{"{"}"key": tainted_var{"}"}</code> &rarr; dict is tainted</li>
-          <li><strong>Dict unpacking:</strong> <code style={{ padding: '2px 6px' }}>{"{"}**tainted_dict{"}"}</code> &rarr; new dict is tainted</li>
-          <li><strong>Binary concatenation:</strong> <code style={{ padding: '2px 6px' }}>"prefix" + tainted_var</code> &rarr; result is tainted</li>
-          <li><strong>Keyword arguments:</strong> <code style={{ padding: '2px 6px' }}>func(param=tainted_var)</code> &rarr; if func is a sink, BLOCK</li>
-          <li><strong>List elements:</strong> <code style={{ padding: '2px 6px' }}>[tainted_var]</code> &rarr; list is tainted</li>
-          <li><strong>Return values:</strong> <code style={{ padding: '2px 6px' }}>return tainted_var</code> &rarr; propagated to all call sites</li>
-        </ul>
+        <pre style={{ fontSize: '0.82rem', lineHeight: '1.6', marginBottom: '28px' }}>{`secret = os.getenv("OPENAI_API_KEY")    # TAINT SOURCE: secret is tainted
+payload = {"Authorization": secret}     # TAINT PROPAGATION: payload dict is tainted
+headers = {**payload, "Content-Type": "application/json"}  # TAINT PROPAGATION
+response = requests.post(url, headers=headers)  # TAINT SINK: S001 BLOCK triggered`}</pre>
 
-        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '8px' }}>Stage 8 &mdash; Policy Evaluation (Rules S001&ndash;S009)</h3>
-        <p style={{ marginBottom: '12px', color: '#333333' }}>
-          <strong>What it does:</strong> The detected taint flows are evaluated against ToolShield's
-          security policy ruleset. Each rule specifies a source-sink pattern and its verdict.
-          Rules are evaluated in priority order; the highest-severity matching rule wins.
+        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '10px' }}>Stage 8 &mdash; Policy Evaluation (Rules S001&ndash;S009)</h3>
+        <p style={{ marginBottom: '12px', color: '#333333', lineHeight: '1.85' }}>
+          Confirmed taint flows are evaluated against ToolShield's nine-rule security policy in priority order; the highest-severity matching rule wins and determines the final verdict.
+          Rules S001, S002, S003, and S008 result in BLOCK; rules S004, S006, S007, and S009 result in REVIEW (flagged but forwarded with a warning header); no matching rule results in ALLOW.
         </p>
         <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '16px', marginBottom: '24px', fontSize: '0.9rem' }}>
           <thead>
-            <tr style={{ borderBottom: '2px solid #E5E5E5' }}>
+            <tr style={{ borderBottom: '2px solid #D8D8DA' }}>
               <th style={{ textAlign: 'left', padding: '10px 16px' }}>Rule</th>
               <th style={{ textAlign: 'left', padding: '10px 16px' }}>Pattern</th>
               <th style={{ textAlign: 'left', padding: '10px 16px' }}>Verdict</th>
             </tr>
           </thead>
           <tbody>
-            <tr style={{ borderBottom: '1px solid #F0F0F0' }}>
+            <tr style={{ borderBottom: '1px solid #E8E8EA' }}>
               <td style={{ padding: '10px 16px' }}><strong>S001</strong></td>
               <td style={{ padding: '10px 16px' }}>Secret &rarr; External Network POST/GET</td>
               <td style={{ padding: '10px 16px' }}><strong style={{ color: '#DC2626' }}>BLOCK</strong></td>
             </tr>
-            <tr style={{ borderBottom: '1px solid #F0F0F0' }}>
+            <tr style={{ borderBottom: '1px solid #E8E8EA' }}>
               <td style={{ padding: '10px 16px' }}><strong>S002</strong></td>
               <td style={{ padding: '10px 16px' }}>Credential &rarr; Process/Shell Execution</td>
               <td style={{ padding: '10px 16px' }}><strong style={{ color: '#DC2626' }}>BLOCK</strong></td>
             </tr>
-            <tr style={{ borderBottom: '1px solid #F0F0F0' }}>
+            <tr style={{ borderBottom: '1px solid #E8E8EA' }}>
               <td style={{ padding: '10px 16px' }}><strong>S003</strong></td>
               <td style={{ padding: '10px 16px' }}>Secret &rarr; Sensitive File Write</td>
               <td style={{ padding: '10px 16px' }}><strong style={{ color: '#DC2626' }}>BLOCK</strong></td>
             </tr>
-            <tr style={{ borderBottom: '1px solid #F0F0F0' }}>
+            <tr style={{ borderBottom: '1px solid #E8E8EA' }}>
               <td style={{ padding: '10px 16px' }}><strong>S004</strong></td>
               <td style={{ padding: '10px 16px' }}>Capability Drift (undeclared capabilities detected)</td>
               <td style={{ padding: '10px 16px' }}><strong style={{ color: '#D97706' }}>REVIEW</strong></td>
             </tr>
-            <tr style={{ borderBottom: '1px solid #F0F0F0' }}>
+            <tr style={{ borderBottom: '1px solid #E8E8EA' }}>
               <td style={{ padding: '10px 16px' }}><strong>S005</strong></td>
               <td style={{ padding: '10px 16px' }}>AST Parsing Failed (syntax error / unreadable)</td>
               <td style={{ padding: '10px 16px' }}><strong style={{ color: '#DC2626' }}>BLOCK</strong></td>
             </tr>
-            <tr style={{ borderBottom: '1px solid #F0F0F0' }}>
+            <tr style={{ borderBottom: '1px solid #E8E8EA' }}>
               <td style={{ padding: '10px 16px' }}><strong>S006</strong></td>
               <td style={{ padding: '10px 16px' }}>Analysis Incomplete (file exceeds size/node bounds)</td>
               <td style={{ padding: '10px 16px' }}><strong style={{ color: '#D97706' }}>REVIEW</strong></td>
             </tr>
-            <tr style={{ borderBottom: '1px solid #F0F0F0' }}>
+            <tr style={{ borderBottom: '1px solid #E8E8EA' }}>
               <td style={{ padding: '10px 16px' }}><strong>S007</strong></td>
               <td style={{ padding: '10px 16px' }}>Baseline Hash Changed (SHA-256 mismatch)</td>
               <td style={{ padding: '10px 16px' }}><strong style={{ color: '#D97706' }}>REVIEW</strong></td>
             </tr>
-            <tr style={{ borderBottom: '1px solid #F0F0F0' }}>
+            <tr style={{ borderBottom: '1px solid #E8E8EA' }}>
               <td style={{ padding: '10px 16px' }}><strong>S008</strong></td>
               <td style={{ padding: '10px 16px' }}>Critical Rug-Pull (new secret&rarr;network flow post-baseline)</td>
               <td style={{ padding: '10px 16px' }}><strong style={{ color: '#DC2626' }}>BLOCK</strong></td>
@@ -599,25 +499,13 @@ response = requests.post(url, headers=headers)  # ← TAINT SINK: S001 BLOCK tri
           </tbody>
         </table>
 
-        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '8px' }}>Stage 8b &mdash; Zero-Execution Pre-Dispatch Gate Enforcement</h3>
-        <p style={{ marginBottom: '8px', color: '#333333' }}>
-          <strong>What it does:</strong> On a BLOCK verdict from the policy engine, ToolShield
-          constructs a JSON-RPC 2.0 error response with code <code style={{ padding: '2px 6px' }}>-32603</code> (Internal Error)
-          and the message <code style={{ padding: '2px 6px' }}>"ToolShield: tool call blocked by policy [RULE_ID]"</code>.
-          This response is returned directly to the AI agent. <strong>The MCP server process's
-          stdin buffer remains empty &mdash; zero bytes written, zero code executed.</strong>
-        </p>
-        <p style={{ marginBottom: '8px', color: '#333333' }}>
-          <strong>Mathematical guarantee:</strong> Because the MCP server process is blocked at
-          stdin read (it is waiting for input that never arrives), and ToolShield has not written
-          any bytes to that stdin, the server process cannot proceed to execute the tool handler function.
-          This is not a best-effort prevention &mdash; it is a structural impossibility for the malicious
-          code to execute when zero bytes reach stdin.
-        </p>
-        <p style={{ marginBottom: '24px', color: '#333333' }}>
-          <strong>On ALLOW verdict:</strong> ToolShield writes the buffered JSON-RPC tool call
-          to the server's stdin, reads the response from stdout, and forwards it to the agent.
-          The entire roundtrip overhead is under 5ms for typical servers.
+        <h3 style={{ fontSize: '1.3rem', marginTop: '24px', marginBottom: '10px' }}>Stage 8b &mdash; Zero-Execution Pre-Dispatch Gate Enforcement</h3>
+        <p style={{ marginBottom: '28px', color: '#333333', lineHeight: '1.85' }}>
+          On a BLOCK verdict, ToolShield constructs a JSON-RPC 2.0 error response with code <code style={{ padding: '2px 6px' }}>-32603</code> and the message
+          <code style={{ padding: '2px 6px' }}>"ToolShield: tool call blocked by policy [RULE_ID]"</code>, returning it directly to the AI agent &mdash;
+          zero bytes are written to the MCP server's stdin, and the server process remains blocked at its stdin read syscall waiting for input that never arrives.
+          This is a mathematical guarantee, not a best-effort prevention: it is structurally impossible for the server's tool handler to execute when no bytes reach its stdin.
+          On an ALLOW verdict, ToolShield writes the buffered JSON-RPC request to the server's stdin, reads the response, and relays it to the agent &mdash; the entire roundtrip overhead is under 5ms.
         </p>
       </div>
 
