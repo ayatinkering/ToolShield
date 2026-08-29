@@ -25,9 +25,9 @@ dev = [
 toolshield = "toolshield.cli.main:app"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/toolshield"]
+packages = ["src/toolshield", "test_lab"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 addopts = "-v --tb=short"
