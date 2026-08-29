@@ -1,31 +1,43 @@
 import React, { useState } from 'react';
-
-import { DocsTab, DemoTab } from './Tabs';
+import { InstallationTab, DocsTab, SolutionTab, DemoTab } from './Tabs';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'docs' | 'demo'>('docs');
+  const [activeTab, setActiveTab] = useState<'installation' | 'docs' | 'solution' | 'demo'>('solution');
 
   return (
     <div className="app">
       <header>
         <div className="container nav-wrapper">
           <div className="logo-section">
+            <img src="/star_shield.svg" alt="Star Shield" className="logo-icon" />
             <a href="#" className="logo-text">ToolShield</a>
-            <span className="logo-tag">P0 MVP</span>
+            <span className="logo-badge">v0.2.0 HACKATHON EDITION</span>
           </div>
 
           <nav className="nav-links">
             <button
+              className={`nav-btn ${activeTab === 'installation' ? 'active' : ''}`}
+              onClick={() => setActiveTab('installation')}
+            >
+              Installation
+            </button>
+            <button
               className={`nav-btn ${activeTab === 'docs' ? 'active' : ''}`}
               onClick={() => setActiveTab('docs')}
             >
-              Docs & Rules
+              Docs
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'solution' ? 'active' : ''}`}
+              onClick={() => setActiveTab('solution')}
+            >
+              Solution
             </button>
             <button
               className={`nav-btn ${activeTab === 'demo' ? 'active' : ''}`}
               onClick={() => setActiveTab('demo')}
             >
-              Interactive Demo
+              Demo
             </button>
           </nav>
 
@@ -44,7 +56,9 @@ export function App() {
       </header>
 
       <main className="container">
+        {activeTab === 'installation' && <InstallationTab />}
         {activeTab === 'docs' && <DocsTab />}
+        {activeTab === 'solution' && <SolutionTab />}
         {activeTab === 'demo' && <DemoTab />}
       </main>
     </div>
