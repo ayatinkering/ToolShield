@@ -4,17 +4,17 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
 
-COPY pyproject.toml uv.lock* ./
-COPY README.md ./
+COPY pyproject.toml README.md ./
 
 # Install dependencies using uv
-RUN uv sync --frozen --no-install-project || uv sync --no-install-project
+RUN uv sync --no-install-project
 
 COPY src/ ./src/
-COPY policies/ ./policies/
 COPY test_lab/ ./test_lab/
 
 RUN uv sync
 
-ENTRYPOINT ["uv", "run", "toolshield"]
-CMD ["--help"]
+EXPOSE 8000
+
+ENTRYPOINT ["uv", "run"]
+CMD ["toolshield", "serve", "--host", "0.0.0.0", "--port", "8000"]
