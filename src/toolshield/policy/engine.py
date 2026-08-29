@@ -5,6 +5,7 @@ from toolshield.models import (
     Finding,
     Policy,
     PolicyEvaluationResult,
+    TaintFlow,
     Verdict,
 )
 
@@ -12,11 +13,18 @@ from toolshield.models import (
 class PolicyEngine:
     """Evaluates scanner findings and capability diffs against security policy rules (S001-S009)."""
 
+    def _find_flow(self, flows: List[TaintFlow], source_types: Set[Capability], sink_type: Capability) -> Optional[TaintFlow]:
+        """DRY helper to search flows for specific source and sink capability matches."""
+        for f in flows:
+            if f.source.source_type in source_types and f.sink.sink_type == sink_type:
+                return f
+        return None
+
     def evaluate(
         self,
         analysis_state: AnalysisState,
         observed_capabilities: Set[Capability],
-        flows: list,
+        flows: List[TaintFlow],
         policy: Optional[Policy] = None,
         baseline_changed: bool = False,
         critical_rug_pull: bool = False,
@@ -50,10 +58,8 @@ class PolicyEngine:
             )
 
         # Rule S001: Secret to external network flow
-        secret_net_flows = [
-            f for f in flows if f.source.source_type in (Capability.ENV_READ, Capability.SECRET_READ) and f.sink.sink_type == Capability.NETWORK_OUTBOUND
-        ]
-        if secret_net_flows:
+        s001_flow = self._find_flow(flows, {Capability.ENV_READ, Capability.SECRET_READ}, Capability.NETWORK_OUTBOUND)
+        if s001_flow:
             rules_fired.append("S001")
             explanations.append("S001: Confirmed secret source flows directly into external network sink.")
             findings.append(
@@ -63,15 +69,13 @@ class PolicyEngine:
                     severity="CRITICAL",
                     verdict=Verdict.BLOCK,
                     description="Secret key or credential exfiltrated to network endpoint.",
-                    flow=secret_net_flows[0],
+                    flow=s001_flow,
                 )
             )
 
         # Rule S002: Credential to process execution
-        cred_proc_flows = [
-            f for f in flows if f.source.source_type in (Capability.ENV_READ, Capability.SECRET_READ) and f.sink.sink_type == Capability.PROCESS_EXEC
-        ]
-        if cred_proc_flows:
+        s002_flow = self._find_flow(flows, {Capability.ENV_READ, Capability.SECRET_READ}, Capability.PROCESS_EXEC)
+        if s002_flow:
             rules_fired.append("S002")
             explanations.append("S002: Credential or secret flows into shell/process execution sink.")
             findings.append(
@@ -81,15 +85,13 @@ class PolicyEngine:
                     severity="CRITICAL",
                     verdict=Verdict.BLOCK,
                     description="Secret passed to process execution.",
-                    flow=cred_proc_flows[0],
+                    flow=s002_flow,
                 )
             )
 
         # Rule S003: Secret to sensitive file write
-        secret_write_flows = [
-            f for f in flows if f.source.source_type in (Capability.ENV_READ, Capability.SECRET_READ) and f.sink.sink_type == Capability.FILE_WRITE
-        ]
-        if secret_write_flows:
+        s003_flow = self._find_flow(flows, {Capability.ENV_READ, Capability.SECRET_READ}, Capability.FILE_WRITE)
+        if s003_flow:
             rules_fired.append("S003")
             explanations.append("S003: Secret flows into file write sink.")
             findings.append(
@@ -99,7 +101,7 @@ class PolicyEngine:
                     severity="CRITICAL",
                     verdict=Verdict.BLOCK,
                     description="Secret written to disk file.",
-                    flow=secret_write_flows[0],
+                    flow=s003_flow,
                 )
             )
 

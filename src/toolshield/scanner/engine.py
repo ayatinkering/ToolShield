@@ -63,20 +63,17 @@ class TaintVisitor(ast.NodeVisitor):
         self.visit_FunctionDef(node)  # type: ignore
 
     def visit_Assign(self, node: ast.Assign):
-        # Resolve target variable names
         targets = []
         for target in node.targets:
             if isinstance(target, ast.Name):
                 targets.append(target.id)
 
-        # Check right hand side expression
         rhs_source = self._evaluate_expr_for_source(node.value)
 
         for var_name in targets:
             if rhs_source:
                 self.sources[var_name] = rhs_source
             else:
-                # Reassignment kills taint for var_name
                 self.sources.pop(var_name, None)
 
         self.generic_visit(node)
@@ -85,7 +82,6 @@ class TaintVisitor(ast.NodeVisitor):
         canonical_func = self.resolver.resolve(node.func)
         loc = extract_location(node, self.file_path)
 
-        # Check for sources (e.g. os.getenv("API_KEY"))
         if is_env_read(canonical_func, node):
             self.observed_capabilities.add(Capability.ENV_READ)
 
@@ -94,7 +90,6 @@ class TaintVisitor(ast.NodeVisitor):
             self.observed_capabilities.add(Capability.SECRET_READ)
             self.observed_capabilities.add(Capability.FILE_READ)
 
-        # Check for sinks
         if canonical_func in NETWORK_SINKS:
             self.observed_capabilities.add(Capability.NETWORK_OUTBOUND)
             sink = Sink(
@@ -143,13 +138,15 @@ class TaintVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def _evaluate_expr_for_source(self, expr: ast.AST) -> Optional[Source]:
-        """Recursively evaluate an expression to see if it derives from a secret source."""
+        """Recursively evaluate an expression for secret source taint."""
+        if expr is None:
+            return None
+
         loc = extract_location(expr, self.file_path)
 
         if isinstance(expr, ast.Call):
             canonical_func = self.resolver.resolve(expr.func)
             if is_env_read(canonical_func, expr):
-                # Check if it's reading a secret key name or generic env
                 source_name = "os.getenv"
                 if expr.args and isinstance(expr.args[0], ast.Constant):
                     source_name = str(expr.args[0].value)
@@ -173,6 +170,32 @@ class TaintVisitor(ast.NodeVisitor):
                 )
                 self.all_sources.append(source)
                 return source
+
+            # Handle method calls on tainted objects (e.g., key.strip())
+            if isinstance(expr.func, ast.Attribute):
+                return self._evaluate_expr_for_source(expr.func.value)
+
+        elif isinstance(expr, ast.Attribute):
+            return self._evaluate_expr_for_source(expr.value)
+
+        elif isinstance(expr, ast.Subscript):
+            canonical_val = self.resolver.resolve(expr.value)
+            if canonical_val in ("os.environ", "environ"):
+                source_name = "os.environ"
+                if isinstance(expr.slice, ast.Constant):
+                    source_name = str(expr.slice.value)
+                source = Source(
+                    source_id=f"src_sub_{loc.line}_{loc.column}",
+                    source_type=Capability.ENV_READ,
+                    name=source_name,
+                    location=loc,
+                )
+                self.all_sources.append(source)
+                return source
+            return self._evaluate_expr_for_source(expr.value)
+
+        elif isinstance(expr, ast.BinOp):
+            return self._evaluate_expr_for_source(expr.left) or self._evaluate_expr_for_source(expr.right)
 
         elif isinstance(expr, ast.Name):
             return self.sources.get(expr.id)
@@ -268,7 +291,7 @@ class ASTScanner:
         all_flows: List[TaintFlow] = []
 
         for dirpath, _, filenames in os.walk(root_dir):
-            for fname in filenames:
+            for fname in sorted(filenames):
                 if fname.endswith(".py"):
                     fpath = os.path.join(dirpath, fname)
                     state, caps, sources, sinks, flows = self.scan_file(fpath)

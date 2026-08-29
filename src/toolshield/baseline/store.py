@@ -2,9 +2,6 @@ import json
 import os
 import hashlib
 from typing import Dict, Any, Tuple, Optional
-from toolshield.models import AnalysisState, Capability, Verdict
-from toolshield.policy import PolicyEngine
-from toolshield.scanner import ASTScanner
 
 
 class BaselineStore:
@@ -18,9 +15,10 @@ class BaselineStore:
 
     @staticmethod
     def compute_implementation_hash(source_root: str) -> str:
-        """Compute SHA-256 hash across Python source files in source_root."""
+        """Compute deterministic SHA-256 hash across sorted Python source files in source_root."""
         hasher = hashlib.sha256()
-        for dirpath, _, filenames in os.walk(source_root):
+        for dirpath, dirnames, filenames in os.walk(source_root):
+            dirnames.sort()  # Enforce deterministic directory traversal
             for fname in sorted(filenames):
                 if fname.endswith(".py"):
                     fpath = os.path.join(dirpath, fname)

@@ -2,6 +2,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 from toolshield import __version__
+from toolshield.models import Verdict
 from toolshield.scanner import ASTScanner
 from toolshield.policy import PolicyEngine
 
@@ -39,7 +40,7 @@ def scan(source_root: str = typer.Argument(..., help="Path to Python source root
     table.add_row("Taint Flows", str(len(flows)))
     table.add_row("Risk Score", str(result.risk_score))
     
-    verdict_color = "green" if result.verdict == "ALLOW" else ("yellow" if result.verdict == "REVIEW" else "bold red")
+    verdict_color = "green" if result.verdict == Verdict.ALLOW else ("yellow" if result.verdict == Verdict.REVIEW else "bold red")
     table.add_row("Final Verdict", f"[{verdict_color}]{result.verdict.value}[/{verdict_color}]")
 
     console.print(table)

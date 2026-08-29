@@ -1,70 +1,43 @@
-import json
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Union
+from pydantic import BaseModel, Field
 
 
-class JSONRPCMessage:
-    """JSON-RPC 2.0 message model preserving exact request IDs (int or str)."""
+class JSONRPCMessage(BaseModel):
+    """Pydantic model for JSON-RPC 2.0 messages with strict validation."""
 
-    def __init__(
-        self,
-        raw_dict: Dict[str, Any],
-        msg_type: str,  # 'request', 'response', 'notification', 'error'
-        method: Optional[str] = None,
-        msg_id: Optional[Union[int, str]] = None,
-        params: Optional[Dict[str, Any]] = None,
-    ):
-        self.raw_dict = raw_dict
-        self.msg_type = msg_type
-        self.method = method
-        self.msg_id = msg_id
-        self.params = params or {}
+    jsonrpc: str = Field(default="2.0", pattern="^2\\.0$")
+    id: Optional[Union[int, str]] = None
+    method: Optional[str] = None
+    params: Dict[str, Any] = Field(default_factory=dict)
+    result: Optional[Any] = None
+    error: Optional[Dict[str, Any]] = None
+
+    @property
+    def msg_type(self) -> str:
+        if self.method:
+            return "request" if self.id is not None else "notification"
+        if self.error:
+            return "error"
+        if self.result is not None:
+            return "response"
+        return "unknown"
 
 
 class JSONRPCRouter:
-    """Parser and router for JSON-RPC stdio traffic."""
+    """Parser and router for JSON-RPC stdio traffic using Pydantic JSONRPCMessage validation."""
 
     @staticmethod
-    def parse(line: str) -> Tuple[Optional[JSONRPCMessage], Optional[str]]:
+    def parse(line: str) -> tuple[Optional[JSONRPCMessage], Optional[str]]:
         """Parse a single JSON line into a JSONRPCMessage."""
         line = line.strip()
         if not line:
             return None, "Empty line"
 
         try:
-            data = json.loads(line)
+            msg = JSONRPCMessage.model_validate_json(line)
+            return msg, None
         except Exception as e:
-            return None, f"Invalid JSON: {e}"
-
-        if not isinstance(data, dict) or data.get("jsonrpc") != "2.0":
-            return None, "Not JSON-RPC 2.0 format"
-
-        msg_id = data.get("id")
-        method = data.get("method")
-        params = data.get("params", {})
-
-        if method:
-            if msg_id is not None:
-                msg_type = "request"
-            else:
-                msg_type = "notification"
-        elif "result" in data or "error" in data:
-            if "error" in data:
-                msg_type = "error"
-            else:
-                msg_type = "response"
-        else:
-            msg_type = "unknown"
-
-        return (
-            JSONRPCMessage(
-                raw_dict=data,
-                msg_type=msg_type,
-                method=method,
-                msg_id=msg_id,
-                params=params,
-            ),
-            None,
-        )
+            return None, f"Invalid JSON-RPC 2.0 message: {e}"
 
     @staticmethod
     def create_error_response(
@@ -76,10 +49,9 @@ class JSONRPCRouter:
         risk_score: int = 100,
     ) -> str:
         """Create a protocol-compliant JSON-RPC error response for blocked calls."""
-        err_resp = {
-            "jsonrpc": "2.0",
-            "id": msg_id,
-            "error": {
+        err_msg = JSONRPCMessage(
+            id=msg_id,
+            error={
                 "code": code,
                 "message": message,
                 "data": {
@@ -88,5 +60,5 @@ class JSONRPCRouter:
                     "risk": risk_score,
                 },
             },
-        }
-        return json.dumps(err_resp) + "\n"
+        )
+        return err_msg.model_dump_json(exclude_none=True) + "\n"
